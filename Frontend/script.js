@@ -40,7 +40,7 @@ function setupSocketListeners() {
 
     socket.on('new_round', (data) => {
         console.log("New round started!");
-        document.getElementById('black-card').textContent = data.blackCard;
+        document.getElementById('black-card').textContent = data.blackCard.text;
         updateScoreboard(data.players);
         isCardCzar = data.players.find(p => p.name === playerName).isCzar;
         if (isCardCzar) {
