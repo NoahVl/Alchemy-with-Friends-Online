@@ -74,6 +74,13 @@
     cursor: default;
 }
 
+.czar-selecting .card:not(.face-down):hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
 .card.winner {
     border: 5px solid gold;
     box-shadow: 0 0 15px gold;

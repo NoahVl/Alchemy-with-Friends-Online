@@ -192,6 +192,10 @@ function setupSocketListeners() {
             document.querySelectorAll('#white-cards .card').forEach(card => {
                 card.classList.remove('face-down');
             });
+            // Add czar-selecting class to enable hover effect
+            if (isCardCzar) {
+                whiteCards.classList.add('czar-selecting');
+            }
         }, 1000);
     }
 }
