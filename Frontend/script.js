@@ -1,15 +1,24 @@
-const socket = io('http://localhost:5000');
-
+let socket;
 let playerName;
 let isCardCzar = false;
 
-socket.on('connect', () => {
-    console.log('Connected to server');
-});
+function connectToServer(serverIP) {
+    socket = io(`http://${serverIP}:5000`);
+
+    socket.on('connect', () => {
+        console.log('Connected to server');
+    });
+
+    setupSocketListeners();
+}
+
+function setupSocketListeners() {
 
 document.getElementById('login-form').addEventListener('submit', (event) => {
     event.preventDefault();
     playerName = document.getElementById('player-name').value;
+    const serverIP = document.getElementById('server-ip').value;
+    connectToServer(serverIP);
     socket.emit('join_game', { name: playerName });
 });
 
