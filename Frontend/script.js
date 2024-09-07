@@ -1,6 +1,7 @@
 let socket;
 let playerName;
 let isCardCzar = false;
+let hasSelectedWinner = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', (event) => {
@@ -57,6 +58,7 @@ function setupSocketListeners() {
 
     socket.on('new_round', (data) => {
         console.log("New round started!", data);  // Debug log
+        hasSelectedWinner = false;  // Reset the flag at the start of each new round
         if (data.blackCard) {
             updateBlackCard(data.blackCard);
         } else {
@@ -180,8 +182,10 @@ function setupSocketListeners() {
             card.className = 'card face-down';
             card.textContent = text;
             card.addEventListener('click', () => {
-                if (isCardCzar) {
+                if (isCardCzar && !hasSelectedWinner) {
                     socket.emit('select_winner', {card: text});
+                    hasSelectedWinner = true;
+                    whiteCards.classList.remove('czar-selecting');
                 }
             });
             whiteCards.appendChild(card);
@@ -193,7 +197,7 @@ function setupSocketListeners() {
                 card.classList.remove('face-down');
             });
             // Add czar-selecting class to enable hover effect
-            if (isCardCzar) {
+            if (isCardCzar && !hasSelectedWinner) {
                 whiteCards.classList.add('czar-selecting');
             }
         }, 1000);
