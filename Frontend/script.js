@@ -97,7 +97,7 @@ function setupSocketListeners() {
     });
 
     socket.on('all_cards_submitted', (data) => {
-        displaySubmittedCards(data.cards);
+        displaySubmittedCards(data.submissions);
     });
 
     socket.on('round_winner', (data) => {
@@ -184,23 +184,28 @@ function setupSocketListeners() {
         });
     }
 
-    function displaySubmittedCards(cards) {
+    function displaySubmittedCards(submissions) {
         const whiteCards = document.getElementById('white-cards');
         whiteCards.innerHTML = '';
-        cards.forEach(text => {
-            const card = document.createElement('div');
-            card.className = 'card face-down';
-            card.textContent = text;
-            card.addEventListener('click', () => {
+        submissions.forEach(submission => {
+            const submissionContainer = document.createElement('div');
+            submissionContainer.className = 'submission-container';
+            submission.cards.forEach(text => {
+                const card = document.createElement('div');
+                card.className = 'card face-down';
+                card.textContent = text;
+                submissionContainer.appendChild(card);
+            });
+            submissionContainer.addEventListener('click', () => {
                 if (isCardCzar && !hasSelectedWinner) {
-                    socket.emit('select_winner', {card: text});
+                    socket.emit('select_winner', {submission: submission.cards});
                     hasSelectedWinner = true;
                     whiteCards.classList.remove('czar-selecting');
                 }
             });
-            whiteCards.appendChild(card);
+            whiteCards.appendChild(submissionContainer);
         });
-        
+
         // Flip cards after a short delay
         setTimeout(() => {
             document.querySelectorAll('#white-cards .card').forEach(card => {
