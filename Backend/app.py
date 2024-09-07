@@ -35,7 +35,9 @@ def get_black_card():
     return {'text': black_card}
 
 def start_new_round():
-    global current_black_card, submitted_cards, winning_card
+    global current_black_card, submitted_cards, winning_card, game_in_progress
+    
+    print("Starting new round")  # Debug print
     
     with cards_stack_lock:
         current_black_card = get_black_card()
@@ -57,10 +59,15 @@ def start_new_round():
         if czar_index is not None:
             players[czar_index]['isCzar'] = False
             players[(czar_index + 1) % len(players)]['isCzar'] = True
+        else:
+            players[0]['isCzar'] = True
 
+    print(f"Emitting new_round event with black card: {current_black_card}")  # Debug print
     socketio.emit('new_round', {'blackCard': current_black_card, 'players': [{'name': p['name'], 'isCzar': p['isCzar'], 'score': p['score']} for p in players]})
     for player in players:
         socketio.emit('update_hand', {'hand': player['hand']}, room=player['sid'])
+    
+    game_in_progress = True
 
 @socketio.on('connect')
 def handle_connect():
@@ -80,6 +87,7 @@ def handle_disconnect():
 
 @socketio.on('join_game')
 def handle_join(data):
+    global game_in_progress
     username = data['name']
     with players_lock:
         if any(p['name'] == username for p in players):
@@ -102,11 +110,13 @@ def handle_join(data):
     emit('join_success', {'hand': hand, 'currentBlackCard': current_black_card})
     socketio.emit('player_list', {'players': [{'name': p['name'], 'isCzar': p['isCzar'], 'score': p['score']} for p in players]})
     
-    global game_in_progress
-    if len(players) >= 2 and not game_in_progress:
-        game_in_progress = True
+    print(f"Player {username} joined. Total players: {len(players)}")  # Debug print
+    
+    if len(players) == 2:
+        print("Starting new game with 2 players")  # Debug print
         start_new_round()
     elif game_in_progress:
+        print(f"Game in progress, sending current state to {username}")  # Debug print
         emit('new_round', {'blackCard': current_black_card, 'players': [{'name': p['name'], 'isCzar': p['isCzar'], 'score': p['score']} for p in players]})
 
 @socketio.on('submit_card')
