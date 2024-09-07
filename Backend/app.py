@@ -32,7 +32,7 @@ def get_black_card():
     with cards_stack_lock:
         black_card = random.choice(cards['blackCards'])
         cards['blackCards'].remove(black_card)
-    return black_card
+    return {'text': black_card}
 
 def start_new_round():
     global current_black_card, submitted_cards, winning_card
@@ -41,6 +41,8 @@ def start_new_round():
         current_black_card = get_black_card()
         submitted_cards = []
         winning_card = None
+    
+    print(f"New black card: {current_black_card}")  # Debug print
 
         for player in players:
             cards_needed = MAX_WHITE_CARDS - len(player['hand'])

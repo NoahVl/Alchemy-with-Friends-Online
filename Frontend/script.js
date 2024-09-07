@@ -44,6 +44,7 @@ function setupSocketListeners() {
         } else {
             blackCardElement.textContent = 'Waiting for black card...';
         }
+        console.log("Updating black card:", blackCard);  // Debug log
     }
 
     socket.on('player_list', (data) => {
@@ -51,9 +52,11 @@ function setupSocketListeners() {
     });
 
     socket.on('new_round', (data) => {
-        console.log("New round started!");
+        console.log("New round started!", data);  // Debug log
         if (data.blackCard) {
             updateBlackCard(data.blackCard);
+        } else {
+            console.log("No black card in new_round data");  // Debug log
         }
         if (data.players) {
             updateScoreboard(data.players);
