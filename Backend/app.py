@@ -144,7 +144,10 @@ def handle_submit_card(data):
         
         all_submissions_complete = all(len(s['cards']) == current_black_card['pick'] for s in submitted_cards)
         if len(submitted_cards) == len(players) - 1 and all_submissions_complete:  # All non-Czar players have submitted all required cards
-            socketio.emit('all_cards_submitted', {'submissions': submitted_cards})
+            # Shuffle the submitted cards before sending them
+            shuffled_submissions = submitted_cards.copy()
+            random.shuffle(shuffled_submissions)
+            socketio.emit('all_cards_submitted', {'submissions': shuffled_submissions})
 
 @socketio.on('select_winner')
 def handle_select_winner(data):
