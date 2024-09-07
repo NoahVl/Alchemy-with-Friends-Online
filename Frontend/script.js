@@ -84,15 +84,27 @@ function setupSocketListeners() {
         console.log(data.message);
     });
 
+    socket.on('update_submitted_cards', (data) => {
+        updateSubmittedCardsCount(data.count);
+    });
+
     socket.on('all_cards_submitted', (data) => {
-        if (isCardCzar) {
-            displaySubmittedCards(data.cards);
-        }
+        displaySubmittedCards(data.cards);
     });
 
     socket.on('round_winner', (data) => {
         alert(`The winning card is: "${data.card}" played by ${data.player}`);
     });
+
+    function updateSubmittedCardsCount(count) {
+        const whiteCards = document.getElementById('white-cards');
+        whiteCards.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            const card = document.createElement('div');
+            card.className = 'card face-down';
+            whiteCards.appendChild(card);
+        }
+    }
 
     socket.on('start_new_round_countdown', () => {
         console.log("Starting countdown for new round");
@@ -154,7 +166,7 @@ function setupSocketListeners() {
         whiteCards.innerHTML = '';
         cards.forEach(text => {
             const card = document.createElement('div');
-            card.className = 'card';
+            card.className = 'card face-down';
             card.textContent = text;
             card.addEventListener('click', () => {
                 if (isCardCzar) {
@@ -163,5 +175,12 @@ function setupSocketListeners() {
             });
             whiteCards.appendChild(card);
         });
+        
+        // Flip cards after a short delay
+        setTimeout(() => {
+            document.querySelectorAll('#white-cards .card').forEach(card => {
+                card.classList.remove('face-down');
+            });
+        }, 1000);
     }
 }
