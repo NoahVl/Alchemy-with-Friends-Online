@@ -38,7 +38,12 @@ function setupSocketListeners() {
     });
 
     function updateBlackCard(blackCard) {
-        document.getElementById('black-card').textContent = blackCard.text;
+        const blackCardElement = document.getElementById('black-card');
+        if (blackCard && blackCard.text) {
+            blackCardElement.textContent = blackCard.text;
+        } else {
+            blackCardElement.textContent = 'Waiting for black card...';
+        }
     }
 
     socket.on('player_list', (data) => {
@@ -47,13 +52,20 @@ function setupSocketListeners() {
 
     socket.on('new_round', (data) => {
         console.log("New round started!");
-        updateBlackCard(data.blackCard);
-        updateScoreboard(data.players);
-        isCardCzar = data.players.find(p => p.name === playerName).isCzar;
-        if (isCardCzar) {
-            document.getElementById('submit-card').classList.add('hidden');
-        } else {
-            document.getElementById('submit-card').classList.remove('hidden');
+        if (data.blackCard) {
+            updateBlackCard(data.blackCard);
+        }
+        if (data.players) {
+            updateScoreboard(data.players);
+            const currentPlayer = data.players.find(p => p.name === playerName);
+            if (currentPlayer) {
+                isCardCzar = currentPlayer.isCzar;
+                if (isCardCzar) {
+                    document.getElementById('submit-card').classList.add('hidden');
+                } else {
+                    document.getElementById('submit-card').classList.remove('hidden');
+                }
+            }
         }
     });
 
