@@ -1,6 +1,6 @@
 import json
 import random
-from flask import Flask
+from flask import Flask, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from threading import Lock
 
