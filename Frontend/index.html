@@ -8,8 +8,6 @@
 <div id="login-screen">
     <h2>Welcome to Cards Against Humanity Clone</h2>
     <form id="login-form">
-        <label for="ip-address">Server IP:</label><br>
-        <input type="text" id="ip-address" name="ip-address" placeholder="Enter Server IP" value="localhost"><br>
         <label for="player-name">Player Name:</label><br>
         <input type="text" id="player-name" name="player-name" placeholder="Enter Your Name" value="Player"><br>
         <input type="submit" value="Connect">
@@ -35,6 +33,7 @@
         <!-- Player rows will be added here dynamically -->
     </table>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

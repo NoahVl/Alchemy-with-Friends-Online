@@ -1,204 +1,135 @@
 import json
 import random
+from flask import Flask
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from threading import Lock
 
-from flask import Flask, jsonify, request
-from flask_cors import CORS
-import time
-
-# Create a lock
-cards_stack_lock = Lock()
-submitted_cards_lock = Lock()
-players_lock = Lock()
-winning_card_lock = Lock()
-
 app = Flask(__name__)
-CORS(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-winning_card = None
+# Create locks
+cards_stack_lock = Lock()
+players_lock = Lock()
 
-
+# Load cards
 def load_cards():
-    # Load the cards from the JSON file
     with open('cards.json') as f:
         cards = json.load(f)
-    # Randomly shuffle the white cards
     random.shuffle(cards['whiteCards'])
-
     return cards
 
-
 cards = load_cards()
-
 MAX_WHITE_CARDS = 3
 
+# Game state
+players = []
+current_black_card = None
+submitted_cards = []
+winning_card = None
+game_in_progress = False
 
 def get_black_card():
     with cards_stack_lock:
-        black_card = random.choice(cards['blackCards'])  # Update this when a new round has started
-        cards['blackCards'].remove(black_card)  # Remove that card from the list
-
+        black_card = random.choice(cards['blackCards'])
+        cards['blackCards'].remove(black_card)
     return black_card
 
-
-current_black_card = get_black_card()
-
-# List of active players
-players = []
-submittedCards = []
-czar_has_been_initialized = False
-
-
-@app.route('/connect', methods=['POST'])
-def connect():
-    data = request.get_json()
-    username = data.get('name')
-
-    with cards_stack_lock:
-        # Add the new player to the list
-        hand = cards['whiteCards'][:MAX_WHITE_CARDS]  # Give the player MAX_WHITE_CARDS random white cards
-        cards['whiteCards'] = cards['whiteCards'][MAX_WHITE_CARDS:]  # Remove the cards from the list
-
-    with players_lock:
-        global czar_has_been_initialized
-        # Add the new player to the list
-        players.append({"isCzar": czar_has_been_initialized is False,
-                        "name": username,
-                        "score": 0,
-                        "lastHeartbeat": time.time(),
-                        'hand': hand,  # Give the player 5 random white cards
-                        })
-        czar_has_been_initialized = True
-    return jsonify(message=f"Hello, {username}!")
-
-
-@app.route('/start-round', methods=['GET'])
-def start_round():
-    with cards_stack_lock:
-        global current_black_card
-        print(current_black_card)
-        return jsonify(blackCard=current_black_card)
-
-
-@app.route('/submit-card', methods=['POST'])
-def submit_card():
-    data = request.get_json()
-    card = data.get('card')
-
-    with submitted_cards_lock:
-        submittedCards.append(card)
-
-    return jsonify(message="Card submitted successfully.")
-
-
-@app.route('/check-submissions', methods=['GET'])
-def check_submissions():
-    # If all players have submitted their cards, return the submitted cards
-    with submitted_cards_lock:
-        # We need at least 2 players to start the game
-        if len(players) > 1 and len(submittedCards) == len(players) - 1:  # -1 because the czar doesn't submit a card
-            return jsonify(submittedCards=submittedCards,
-                           czar={"name": next(player['name'] for player in players if player['isCzar'])})
-        else:
-            return jsonify(message="Waiting for players to submit.")
-
-
-@app.route('/heartbeat', methods=['POST'])
-def heartbeat():
-    data = request.get_json()
-    username = data.get('name')
-    # Update the player's last heartbeat time
-    for player in players:
-        if player['name'] == username:
-            player['lastHeartbeat'] = time.time()
-    return jsonify(message=f"Heartbeat received from {username}")
-
-
-@app.route('/scoreboard', methods=['GET'])
-def scoreboard():
-    with players_lock:
-        # Remove players who haven't sent a heartbeat in the last 10 seconds
-        players[:] = [player for player in players if time.time() - player['lastHeartbeat'] < 10]
-
-        # If our czar has left, we need to assign it to a new player
-        if len([player for player in players if player['isCzar']]) == 0:
-            if len(players) > 0:
-                # Select a random player to be the czar
-                random.choice(players)['isCzar'] = True
-
-    # Return the list of players
-    return jsonify(players=players)
-
-
-@app.route('/czar-rating', methods=['GET'])
-def czar_rating():
-    # Find the Czar's choice
-    czar_choice = None
-
-    global winning_card
-
-    with winning_card_lock:
-        czar_choice = winning_card
-
-    # Return the Czar's choice in the response
-    return jsonify(czarChoice=czar_choice)
-
-
-@app.route('/select-winner', methods=['POST'])
-def select_winner():
-    data = request.get_json()
-
-    global winning_card
-
-    with winning_card_lock:
-        winning_card = data.get('card')
-
-    # Find the player who submitted the winning card
-    winner = next((player for player in players if winning_card in player['hand']), None)
-
-    if winner:
-        # Increment the winner's score
-        winner['score'] += 1
-
-    # Start new round
-    start_new_round()
-
-    return jsonify(message="Winner selected successfully.")
-
-
 def start_new_round():
-    global current_black_card
-    global cards
-
+    global current_black_card, submitted_cards, winning_card
+    
     with cards_stack_lock:
         current_black_card = get_black_card()
+        submitted_cards = []
+        winning_card = None
 
-        # Remove the submitted cards from the players' hands
-        with submitted_cards_lock:
-            for player in players:
-                player['hand'] = [card for card in player['hand'] if
-                                  card not in submittedCards]  # TODO: Needs to be rewritten if you want to include joker cards
-
-        # Clear submitted cards
-        submittedCards.clear()
-
-        # Fill up the players' hands to MAX_WHITE_CARDS
         for player in players:
-            # If we run out of white cards, reload the cards
-            if len(cards['whiteCards']) < MAX_WHITE_CARDS - len(player['hand']):
-                cards = load_cards()
+            cards_needed = MAX_WHITE_CARDS - len(player['hand'])
+            if cards_needed > 0:
+                if len(cards['whiteCards']) < cards_needed:
+                    cards.update(load_cards())
+                player['hand'].extend(cards['whiteCards'][:cards_needed])
+                cards['whiteCards'] = cards['whiteCards'][cards_needed:]
 
-            player['hand'].extend(cards['whiteCards'][:MAX_WHITE_CARDS - len(
-                player['hand'])])  # Give the player MAX_WHITE_CARDS random white cards
-            cards['whiteCards'] = cards['whiteCards'][
-                                  MAX_WHITE_CARDS - len(player['hand']):]  # Remove the cards from the list
-
-    # Find the next Czar
     with players_lock:
         czar_index = next((i for i, player in enumerate(players) if player['isCzar']), None)
-        players[czar_index]['isCzar'] = False
-        players[(czar_index + 1) % len(players)]['isCzar'] = True
+        if czar_index is not None:
+            players[czar_index]['isCzar'] = False
+            players[(czar_index + 1) % len(players)]['isCzar'] = True
 
+    socketio.emit('new_round', {'blackCard': current_black_card, 'players': [{'name': p['name'], 'isCzar': p['isCzar'], 'score': p['score']} for p in players]})
+    for player in players:
+        socketio.emit('update_hand', {'hand': player['hand']}, room=player['sid'])
+
+@socketio.on('connect')
+def handle_connect():
+    print(f"Client connected: {request.sid}")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    global game_in_progress
+    with players_lock:
+        players[:] = [p for p in players if p['sid'] != request.sid]
+        if len(players) == 0:
+            game_in_progress = False
+        elif len(players) == 1:
+            players[0]['isCzar'] = True
+    socketio.emit('player_list', {'players': [{'name': p['name'], 'isCzar': p['isCzar'], 'score': p['score']} for p in players]})
+
+@socketio.on('join_game')
+def handle_join(data):
+    username = data['name']
+    with players_lock:
+        if any(p['name'] == username for p in players):
+            emit('error', {'message': 'Username already taken'})
+            return
+        
+        hand = cards['whiteCards'][:MAX_WHITE_CARDS]
+        cards['whiteCards'] = cards['whiteCards'][MAX_WHITE_CARDS:]
+        
+        player = {
+            'sid': request.sid,
+            'name': username,
+            'isCzar': len(players) == 0,
+            'score': 0,
+            'hand': hand
+        }
+        players.append(player)
+        join_room(request.sid)
+    
+    emit('join_success', {'hand': hand})
+    socketio.emit('player_list', {'players': [{'name': p['name'], 'isCzar': p['isCzar'], 'score': p['score']} for p in players]})
+    
+    global game_in_progress
+    if len(players) >= 2 and not game_in_progress:
+        game_in_progress = True
+        start_new_round()
+
+@socketio.on('submit_card')
+def handle_submit_card(data):
+    card = data['card']
+    player = next((p for p in players if p['sid'] == request.sid), None)
+    if player and not player['isCzar'] and card in player['hand']:
+        submitted_cards.append({'card': card, 'player': player['name']})
+        player['hand'].remove(card)
+        emit('card_submitted', {'message': 'Card submitted successfully'})
+        
+        if len(submitted_cards) == len(players) - 1:  # All non-Czar players have submitted
+            czar = next(p for p in players if p['isCzar'])
+            socketio.emit('all_cards_submitted', {'cards': [sc['card'] for sc in submitted_cards]}, room=czar['sid'])
+
+@socketio.on('select_winner')
+def handle_select_winner(data):
+    global winning_card
+    winning_card = data['card']
+    winner = next((sc['player'] for sc in submitted_cards if sc['card'] == winning_card), None)
+    if winner:
+        for player in players:
+            if player['name'] == winner:
+                player['score'] += 1
+                break
+    
+    socketio.emit('round_winner', {'card': winning_card, 'player': winner})
+    start_new_round()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)
