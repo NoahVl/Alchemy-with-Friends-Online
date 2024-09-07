@@ -152,7 +152,7 @@ def handle_select_winner(data):
     if winner:
         for player in players:
             if player['name'] == winner:
-                player['score'] += len(winning_submission)  # Score based on number of cards
+                player['score'] += 1 # Even when multiple cards have to be selected, the user gets 1 point.
                 break
     
     socketio.emit('round_winner', {'cards': winning_submission, 'player': winner})
