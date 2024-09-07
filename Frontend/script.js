@@ -2,25 +2,27 @@ let socket;
 let playerName;
 let isCardCzar = false;
 
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('login-form').addEventListener('submit', (event) => {
+        event.preventDefault();
+        playerName = document.getElementById('player-name').value;
+        const serverIP = document.getElementById('server-ip').value;
+        connectToServer(serverIP);
+    });
+});
+
 function connectToServer(serverIP) {
     socket = io(`http://${serverIP}:5000`);
 
     socket.on('connect', () => {
         console.log('Connected to server');
+        socket.emit('join_game', {name: playerName});
     });
 
     setupSocketListeners();
 }
 
 function setupSocketListeners() {
-
-    document.getElementById('login-form').addEventListener('submit', (event) => {
-        event.preventDefault();
-        playerName = document.getElementById('player-name').value;
-        const serverIP = document.getElementById('server-ip').value;
-        connectToServer(serverIP);
-        socket.emit('join_game', {name: playerName});
-    });
 
     socket.on('error', (data) => {
         alert(data.message);

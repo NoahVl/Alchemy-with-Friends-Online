@@ -5,7 +5,7 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 from threading import Lock
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Create locks
 cards_stack_lock = Lock()
@@ -63,6 +63,7 @@ def start_new_round():
 @socketio.on('connect')
 def handle_connect():
     print(f"Client connected: {request.sid}")
+    emit('connection_success', {'message': 'Successfully connected to server'})
 
 @socketio.on('disconnect')
 def handle_disconnect():
