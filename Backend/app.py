@@ -44,13 +44,13 @@ def start_new_round():
     
     print(f"New black card: {current_black_card}")  # Debug print
 
-        for player in players:
-            cards_needed = MAX_WHITE_CARDS - len(player['hand'])
-            if cards_needed > 0:
-                if len(cards['whiteCards']) < cards_needed:
-                    cards.update(load_cards())
-                player['hand'].extend(cards['whiteCards'][:cards_needed])
-                cards['whiteCards'] = cards['whiteCards'][cards_needed:]
+    for player in players:
+        cards_needed = MAX_WHITE_CARDS - len(player['hand'])
+        if cards_needed > 0:
+            if len(cards['whiteCards']) < cards_needed:
+                cards.update(load_cards())
+            player['hand'].extend(cards['whiteCards'][:cards_needed])
+            cards['whiteCards'] = cards['whiteCards'][cards_needed:]
 
     with players_lock:
         czar_index = next((i for i, player in enumerate(players) if player['isCzar']), None)
