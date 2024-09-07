@@ -132,7 +132,9 @@ def handle_submit_card(data):
     if player and not player['isCzar'] and all(card in player['hand'] for card in cards):
         existing_submission = next((s for s in submitted_cards if s['player'] == player['name']), None)
         if existing_submission:
-            existing_submission['cards'].extend(cards)
+            # Player has already submitted, don't allow another submission
+            emit('error', {'message': 'You have already submitted cards for this round'})
+            return
         else:
             submitted_cards.append({'cards': cards, 'player': player['name']})
         for card in cards:

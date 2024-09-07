@@ -2,6 +2,7 @@ let socket;
 let playerName;
 let isCardCzar = false;
 let hasSelectedWinner = false;
+let hasSubmittedCards = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', (event) => {
@@ -65,6 +66,7 @@ function setupSocketListeners() {
     socket.on('new_round', (data) => {
         console.log("New round started!", data);  // Debug log
         hasSelectedWinner = false;  // Reset the flag at the start of each new round
+        hasSubmittedCards = false;  // Reset the submission flag at the start of each new round
         if (data.blackCard) {
             updateBlackCard(data.blackCard);
         } else {
@@ -140,6 +142,11 @@ function setupSocketListeners() {
     let selectedCards = [];
     
     document.getElementById('submit-card').addEventListener('click', () => {
+        if (hasSubmittedCards) {
+            alert('You have already submitted your card(s) for this round.');
+            return;
+        }
+
         const blackCard = document.getElementById('black-card');
         const requiredCards = parseInt(blackCard.dataset.pick);
         const selectedCard = document.querySelector('#player-hand .card.selected');
@@ -152,6 +159,8 @@ function setupSocketListeners() {
                 socket.emit('submit_card', {cards: selectedCards});
                 selectedCards = [];
                 document.getElementById('submit-card').textContent = 'Submit Card';
+                hasSubmittedCards = true;
+                document.getElementById('submit-card').disabled = true;
             } else {
                 document.getElementById('submit-card').textContent = 'Submit 2nd Card';
             }
