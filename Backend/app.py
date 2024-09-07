@@ -150,6 +150,8 @@ def handle_select_winner(data):
                 break
     
     socketio.emit('round_winner', {'card': winning_card, 'player': winner})
+    socketio.emit('start_new_round_countdown')
+    socketio.sleep(10)
     start_new_round()
 
 if __name__ == '__main__':

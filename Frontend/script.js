@@ -45,6 +45,10 @@ function setupSocketListeners() {
             blackCardElement.textContent = 'Waiting for black card...';
         }
         console.log("Updating black card:", blackCard);  // Debug log
+
+        // Clear white cards
+        const whiteCards = document.getElementById('white-cards');
+        whiteCards.innerHTML = '';
     }
 
     socket.on('player_list', (data) => {
@@ -88,6 +92,18 @@ function setupSocketListeners() {
 
     socket.on('round_winner', (data) => {
         alert(`The winning card is: "${data.card}" played by ${data.player}`);
+    });
+
+    socket.on('start_new_round_countdown', () => {
+        console.log("Starting countdown for new round");
+        let countdown = 10;
+        const countdownInterval = setInterval(() => {
+            console.log(`New round starting in ${countdown} seconds`);
+            countdown--;
+            if (countdown < 0) {
+                clearInterval(countdownInterval);
+            }
+        }, 1000);
     });
 
     document.getElementById('submit-card').addEventListener('click', () => {
