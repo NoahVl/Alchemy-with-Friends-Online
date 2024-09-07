@@ -97,13 +97,15 @@ def handle_join(data):
         players.append(player)
         join_room(request.sid)
     
-    emit('join_success', {'hand': hand})
+    emit('join_success', {'hand': hand, 'currentBlackCard': current_black_card})
     socketio.emit('player_list', {'players': [{'name': p['name'], 'isCzar': p['isCzar'], 'score': p['score']} for p in players]})
     
     global game_in_progress
     if len(players) >= 2 and not game_in_progress:
         game_in_progress = True
         start_new_round()
+    elif game_in_progress:
+        emit('new_round', {'blackCard': current_black_card, 'players': [{'name': p['name'], 'isCzar': p['isCzar'], 'score': p['score']} for p in players]})
 
 @socketio.on('submit_card')
 def handle_submit_card(data):

@@ -32,7 +32,14 @@ function setupSocketListeners() {
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('game-screen').classList.remove('hidden');
         updatePlayerHand(data.hand);
+        if (data.currentBlackCard) {
+            updateBlackCard(data.currentBlackCard);
+        }
     });
+
+    function updateBlackCard(blackCard) {
+        document.getElementById('black-card').textContent = blackCard.text;
+    }
 
     socket.on('player_list', (data) => {
         updateScoreboard(data.players);
@@ -40,7 +47,7 @@ function setupSocketListeners() {
 
     socket.on('new_round', (data) => {
         console.log("New round started!");
-        document.getElementById('black-card').textContent = data.blackCard.text;
+        updateBlackCard(data.blackCard);
         updateScoreboard(data.players);
         isCardCzar = data.players.find(p => p.name === playerName).isCzar;
         if (isCardCzar) {
