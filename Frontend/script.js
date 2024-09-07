@@ -101,13 +101,13 @@ function setupSocketListeners() {
     });
 
     socket.on('round_winner', (data) => {
-        const winningCard = Array.from(document.querySelectorAll('#white-cards .card'))
-            .find(card => card.textContent === data.card);
-        if (winningCard) {
-            winningCard.classList.add('winner');
-            winningCard.title = `Winning card played by ${data.player}`;
-        }
-        console.log(`The winning card is: "${data.card}" played by ${data.player}`);
+        const winningCards = Array.from(document.querySelectorAll('#white-cards .card'))
+            .filter(card => data.cards.includes(card.textContent));
+        winningCards.forEach(card => {
+            card.classList.add('winner');
+            card.title = `Winning card played by ${data.player}`;
+        });
+        console.log(`The winning cards are: "${data.cards.join(', ')}" played by ${data.player}`);
     });
 
     function updateSubmittedCardsCount(count) {
