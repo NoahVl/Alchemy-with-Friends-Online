@@ -42,14 +42,20 @@ function setupSocketListeners() {
         const blackCardElement = document.getElementById('black-card');
         if (blackCard && blackCard.text) {
             blackCardElement.textContent = blackCard.text;
+            blackCardElement.dataset.pick = blackCard.pick || 1;
         } else {
             blackCardElement.textContent = 'Waiting for black card...';
+            blackCardElement.dataset.pick = 1;
         }
         console.log("Updating black card:", blackCard);  // Debug log
 
         // Clear white cards
         const whiteCards = document.getElementById('white-cards');
         whiteCards.innerHTML = '';
+
+        // Update submit button text
+        const submitButton = document.getElementById('submit-card');
+        submitButton.textContent = blackCard.pick === 2 ? 'Submit 2 Cards' : 'Submit Card';
     }
 
     socket.on('player_list', (data) => {
@@ -132,12 +138,16 @@ function setupSocketListeners() {
     });
 
     document.getElementById('submit-card').addEventListener('click', () => {
-        const selectedCard = document.querySelector('#player-hand .card.selected');
-        if (selectedCard) {
-            socket.emit('submit_card', {card: selectedCard.textContent});
-            selectedCard.remove();
+        const blackCard = document.getElementById('black-card');
+        const requiredCards = parseInt(blackCard.dataset.pick);
+        const selectedCards = document.querySelectorAll('#player-hand .card.selected');
+        
+        if (selectedCards.length === requiredCards) {
+            const cards = Array.from(selectedCards).map(card => card.textContent);
+            socket.emit('submit_card', {cards: cards});
+            selectedCards.forEach(card => card.remove());
         } else {
-            alert('Please select a card to submit.');
+            alert(`Please select ${requiredCards} card${requiredCards > 1 ? 's' : ''} to submit.`);
         }
     });
 

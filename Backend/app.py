@@ -36,7 +36,7 @@ def get_black_card():
             print("Reloading black cards")  # Debug print
             cards.update(load_cards())
         black_card = cards['blackCards'].pop()
-    return {'text': black_card}
+    return {'text': black_card['text'], 'pick': black_card.get('pick', 1)}
 
 def start_new_round():
     global current_black_card, submitted_cards, winning_card, game_in_progress
@@ -127,29 +127,30 @@ def handle_join(data):
 
 @socketio.on('submit_card')
 def handle_submit_card(data):
-    card = data['card']
+    cards = data['cards']
     player = next((p for p in players if p['sid'] == request.sid), None)
-    if player and not player['isCzar'] and card in player['hand']:
-        submitted_cards.append({'card': card, 'player': player['name']})
-        player['hand'].remove(card)
-        emit('card_submitted', {'message': 'Card submitted successfully'})
+    if player and not player['isCzar'] and all(card in player['hand'] for card in cards):
+        submitted_cards.append({'cards': cards, 'player': player['name']})
+        for card in cards:
+            player['hand'].remove(card)
+        emit('card_submitted', {'message': 'Card(s) submitted successfully'})
         socketio.emit('update_submitted_cards', {'count': len(submitted_cards)})
         
         if len(submitted_cards) == len(players) - 1:  # All non-Czar players have submitted
-            socketio.emit('all_cards_submitted', {'cards': [sc['card'] for sc in submitted_cards]})
+            socketio.emit('all_cards_submitted', {'submissions': submitted_cards})
 
 @socketio.on('select_winner')
 def handle_select_winner(data):
-    global winning_card
-    winning_card = data['card']
-    winner = next((sc['player'] for sc in submitted_cards if sc['card'] == winning_card), None)
+    global winning_submission
+    winning_submission = data['submission']
+    winner = next((sc['player'] for sc in submitted_cards if sc['cards'] == winning_submission), None)
     if winner:
         for player in players:
             if player['name'] == winner:
-                player['score'] += 1
+                player['score'] += len(winning_submission)  # Score based on number of cards
                 break
     
-    socketio.emit('round_winner', {'card': winning_card, 'player': winner})
+    socketio.emit('round_winner', {'cards': winning_submission, 'player': winner})
     socketio.emit('start_new_round_countdown')
     socketio.sleep(10)
     start_new_round()
