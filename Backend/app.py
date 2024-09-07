@@ -9,6 +9,7 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Create locks
 cards_stack_lock = Lock()
+black_cards_lock = Lock()
 players_lock = Lock()
 
 # Load cards
@@ -16,6 +17,7 @@ def load_cards():
     with open('cards.json') as f:
         cards = json.load(f)
     random.shuffle(cards['whiteCards'])
+    random.shuffle(cards['blackCards'])
     return cards
 
 cards = load_cards()
@@ -29,9 +31,11 @@ winning_card = None
 game_in_progress = False
 
 def get_black_card():
-    with cards_stack_lock:
-        black_card = random.choice(cards['blackCards'])
-        cards['blackCards'].remove(black_card)
+    with black_cards_lock:
+        if not cards['blackCards']:
+            print("Reloading black cards")  # Debug print
+            cards.update(load_cards())
+        black_card = cards['blackCards'].pop()
     return {'text': black_card}
 
 def start_new_round():
@@ -39,20 +43,21 @@ def start_new_round():
     
     print("Starting new round")  # Debug print
     
-    with cards_stack_lock:
-        current_black_card = get_black_card()
-        submitted_cards = []
-        winning_card = None
+    current_black_card = get_black_card()
+    submitted_cards = []
+    winning_card = None
     
     print(f"New black card: {current_black_card}")  # Debug print
 
-    for player in players:
-        cards_needed = MAX_WHITE_CARDS - len(player['hand'])
-        if cards_needed > 0:
-            if len(cards['whiteCards']) < cards_needed:
-                cards.update(load_cards())
-            player['hand'].extend(cards['whiteCards'][:cards_needed])
-            cards['whiteCards'] = cards['whiteCards'][cards_needed:]
+    with cards_stack_lock:
+        for player in players:
+            cards_needed = MAX_WHITE_CARDS - len(player['hand'])
+            if cards_needed > 0:
+                if len(cards['whiteCards']) < cards_needed:
+                    print("Reloading white cards")  # Debug print
+                    cards.update(load_cards())
+                player['hand'].extend(cards['whiteCards'][:cards_needed])
+                cards['whiteCards'] = cards['whiteCards'][cards_needed:]
 
     with players_lock:
         czar_index = next((i for i, player in enumerate(players) if player['isCzar']), None)
@@ -68,6 +73,7 @@ def start_new_round():
         socketio.emit('update_hand', {'hand': player['hand']}, room=player['sid'])
     
     game_in_progress = True
+    print("New round started successfully")  # Debug print
 
 @socketio.on('connect')
 def handle_connect():
