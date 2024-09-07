@@ -1,0 +1,67 @@
+#black-card {
+    background-color: black;
+    color: white;
+}
+
+.card-container {
+    background-color: #f0f0f0; /* Adjust as needed */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+#white-cards, #player-hand {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start;
+}
+
+.card {
+    border: 3px solid black;
+    padding: 10px;
+    margin: 10px;
+    width: 120px; /* Adjust as needed */
+    height: 200px; /* Adjust as needed */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: white; /* Added this line */
+}
+
+.card.selected {
+    border-color: red;
+}
+
+#player-hand .card:hover {
+    transform: scale(1.05); /* Adjust as needed */
+    transition: transform 0.3s ease-in-out; /* Adjust as needed */
+}
+
+#player-info {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: linear-gradient(to right, #6484ff, #061a40); /* Blue gradient */
+    color: #ffffff; /* White text */
+    padding: 20px;
+    border-radius: 10px;
+    width: auto;
+    height: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    font-family: Arial, sans-serif;
+}
+
+#player-info th, #player-info td {
+    padding: 5px;
+    text-align: center; /* Center the text */
+}
+
+.hidden {
+    display: none;
+}
+
+.card.disabled {
+    background-color: #cccccc; /* Gray out the card */
+    pointer-events: none; /* Disable click events */
+}

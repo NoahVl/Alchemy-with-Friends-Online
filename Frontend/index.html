@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cards Against Humanity Clone</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+<div id="login-screen">
+    <h2>Welcome to Cards Against Humanity Clone</h2>
+    <form id="login-form">
+        <label for="ip-address">Server IP:</label><br>
+        <input type="text" id="ip-address" name="ip-address" placeholder="Enter Server IP" value="localhost"><br>
+        <label for="player-name">Player Name:</label><br>
+        <input type="text" id="player-name" name="player-name" placeholder="Enter Your Name" value="Player"><br>
+        <input type="submit" value="Connect">
+    </form>
+</div>
+<div id="game-screen" class="hidden">
+    <div class="card-container">
+        <div id="black-card" class="card"></div>
+        <div id="white-cards">
+
+        </div>
+    </div>
+    <div id="player-hand">
+
+    </div>
+    <button id="submit-card">Submit Card</button>
+    <table id="player-info">
+        <tr>
+            <th>Card Czar</th>
+            <th>Name</th>
+            <th>Rounds Won</th>
+        </tr>
+        <!-- Player rows will be added here dynamically -->
+    </table>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
