@@ -93,7 +93,13 @@ function setupSocketListeners() {
     });
 
     socket.on('round_winner', (data) => {
-        alert(`The winning card is: "${data.card}" played by ${data.player}`);
+        const winningCard = Array.from(document.querySelectorAll('#white-cards .card'))
+            .find(card => card.textContent === data.card);
+        if (winningCard) {
+            winningCard.classList.add('winner');
+            winningCard.title = `Winning card played by ${data.player}`;
+        }
+        console.log(`The winning card is: "${data.card}" played by ${data.player}`);
     });
 
     function updateSubmittedCardsCount(count) {
@@ -114,6 +120,11 @@ function setupSocketListeners() {
             countdown--;
             if (countdown < 0) {
                 clearInterval(countdownInterval);
+                // Remove winner class from all cards
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('winner');
+                    card.title = '';
+                });
             }
         }, 1000);
     });
