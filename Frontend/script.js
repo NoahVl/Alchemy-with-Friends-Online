@@ -77,10 +77,13 @@ function setupSocketListeners() {
             const currentPlayer = data.players.find(p => p.name === playerName);
             if (currentPlayer) {
                 isCardCzar = currentPlayer.isCzar;
+                const submitButton = document.getElementById('submit-card');
                 if (isCardCzar) {
-                    document.getElementById('submit-card').classList.add('hidden');
+                    submitButton.classList.add('hidden');
                 } else {
-                    document.getElementById('submit-card').classList.remove('hidden');
+                    submitButton.classList.remove('hidden');
+                    submitButton.disabled = false;  // Enable the submit button
+                    submitButton.textContent = 'Submit Card';  // Reset button text
                 }
             }
         }
