@@ -137,17 +137,26 @@ function setupSocketListeners() {
         }, 1000);
     });
 
+    let selectedCards = [];
+    
     document.getElementById('submit-card').addEventListener('click', () => {
         const blackCard = document.getElementById('black-card');
         const requiredCards = parseInt(blackCard.dataset.pick);
-        const selectedCards = document.querySelectorAll('#player-hand .card.selected');
+        const selectedCard = document.querySelector('#player-hand .card.selected');
         
-        if (selectedCards.length === requiredCards) {
-            const cards = Array.from(selectedCards).map(card => card.textContent);
-            socket.emit('submit_card', {cards: cards});
-            selectedCards.forEach(card => card.remove());
+        if (selectedCard) {
+            selectedCards.push(selectedCard.textContent);
+            selectedCard.remove();
+            
+            if (selectedCards.length === requiredCards) {
+                socket.emit('submit_card', {cards: selectedCards});
+                selectedCards = [];
+                document.getElementById('submit-card').textContent = 'Submit Card';
+            } else {
+                document.getElementById('submit-card').textContent = 'Submit 2nd Card';
+            }
         } else {
-            alert(`Please select ${requiredCards} card${requiredCards > 1 ? 's' : ''} to submit.`);
+            alert(`Please select a card to submit.`);
         }
     });
 
@@ -182,6 +191,9 @@ function setupSocketListeners() {
             });
             playerHand.appendChild(card);
         });
+        
+        // Reset submit button text
+        document.getElementById('submit-card').textContent = 'Submit Card';
     }
 
     function displaySubmittedCards(submissions) {

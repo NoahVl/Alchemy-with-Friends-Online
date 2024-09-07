@@ -130,13 +130,18 @@ def handle_submit_card(data):
     cards = data['cards']
     player = next((p for p in players if p['sid'] == request.sid), None)
     if player and not player['isCzar'] and all(card in player['hand'] for card in cards):
-        submitted_cards.append({'cards': cards, 'player': player['name']})
+        existing_submission = next((s for s in submitted_cards if s['player'] == player['name']), None)
+        if existing_submission:
+            existing_submission['cards'].extend(cards)
+        else:
+            submitted_cards.append({'cards': cards, 'player': player['name']})
         for card in cards:
             player['hand'].remove(card)
         emit('card_submitted', {'message': 'Card(s) submitted successfully'})
         socketio.emit('update_submitted_cards', {'count': len(submitted_cards)})
         
-        if len(submitted_cards) == len(players) - 1:  # All non-Czar players have submitted
+        all_submissions_complete = all(len(s['cards']) == current_black_card['pick'] for s in submitted_cards)
+        if len(submitted_cards) == len(players) - 1 and all_submissions_complete:  # All non-Czar players have submitted all required cards
             socketio.emit('all_cards_submitted', {'submissions': submitted_cards})
 
 @socketio.on('select_winner')
