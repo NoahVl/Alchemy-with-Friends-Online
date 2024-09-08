@@ -30,6 +30,7 @@
     background-color: white;
     overflow-y: auto;
     word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .card.selected {
