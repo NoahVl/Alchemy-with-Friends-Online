@@ -1,13 +1,12 @@
 # 🃏 Cards Against Humanity Clone 🎭
 
 ## 🌟 Introduction
-Welcome to my Cards Against Humanity Clone! This project started as a fun way to play [Microsoft's Alchemy with Friends](https://www.microsoft.com/en-us/research/uploads/prod/2020/11/Alchemy-with-Friends-Print-at-Home-2020.pdf) with my friends, but has evolved into a full-fledged Cards Against Humanity-style game.
+Welcome to my Cards Against Humanity Clone! This project started as a fun way to play [Microsoft's Alchemy with Friends](https://www.microsoft.com/en-us/research/uploads/prod/2020/11/Alchemy-with-Friends-Print-at-Home-2020.pdf) with my friends, but can be used to play with any (manually inserted) cards for a Cards Against Humanity-style game.
 
 ## 🚀 Features
 - Real-time multiplayer gameplay using WebSockets
 - Dynamic card submission and selection
 - Customizable card decks
-- Responsive design for various devices
 
 ## ⚠️ Disclaimer
 This is a quick project to explore AI-assisted web development. **Please note:** This project should not be hosted in any serious setting as players may be able to manipulate their data and send it to the server.
