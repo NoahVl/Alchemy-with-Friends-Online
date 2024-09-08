@@ -194,7 +194,7 @@ function setupSocketListeners() {
         hand.forEach(text => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.innerHTML = text.replace(/\n/g, '<br>');
+            card.innerHTML = text.replace(/\\n/g, '<br>');
             card.addEventListener('click', () => {
                 if (!isCardCzar) {
                     document.querySelectorAll('#player-hand .card').forEach(c => c.classList.remove('selected'));
