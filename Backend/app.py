@@ -36,7 +36,7 @@ def get_black_card():
             print("Reloading black cards")  # Debug print
             cards.update(load_cards())
         black_card = cards['blackCards'].pop()
-    return {'text': black_card['text'], 'pick': black_card.get('pick', 1)}
+    return {'text': black_card['text'].replace('\n', '<br>'), 'pick': black_card.get('pick', 1)}
 
 def start_new_round():
     global current_black_card, submitted_cards, winning_card, game_in_progress
@@ -56,7 +56,7 @@ def start_new_round():
                 if len(cards['whiteCards']) < cards_needed:
                     print("Reloading white cards")  # Debug print
                     cards.update(load_cards())
-                player['hand'].extend(cards['whiteCards'][:cards_needed])
+                player['hand'].extend([card.replace('\n', '<br>') for card in cards['whiteCards'][:cards_needed]])
                 cards['whiteCards'] = cards['whiteCards'][cards_needed:]
 
     with players_lock:
