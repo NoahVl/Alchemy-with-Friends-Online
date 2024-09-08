@@ -23,10 +23,13 @@
     width: 120px; /* Adjust as needed */
     height: 200px; /* Adjust as needed */
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    background-color: white; /* Added this line */
+    background-color: white;
+    overflow-y: auto;
+    word-wrap: break-word;
 }
 
 .card.selected {
