@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function connectToServer(serverIP) {
-    socket = io(`http://${serverIP}:5000`);
+    socket = io(`https://${serverIP}:5000`);
 
     socket.on('connect', () => {
         console.log('Connected to server');

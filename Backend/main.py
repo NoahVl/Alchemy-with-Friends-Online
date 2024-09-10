@@ -12,6 +12,9 @@ cards_stack_lock = Lock()
 black_cards_lock = Lock()
 players_lock = Lock()
 
+# Path to your certificate and key files
+ssl_context = ('./cert.pem', './key.pem')
+
 # Load cards
 def load_cards():
     with open('cards.json') as f:
@@ -166,4 +169,4 @@ def handle_select_winner(data):
     start_new_round()
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, ssl_context=ssl_context)
