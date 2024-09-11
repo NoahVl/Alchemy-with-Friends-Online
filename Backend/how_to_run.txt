@@ -1,1 +1,3 @@
+- turn off firewall
+
 lt --port 25565

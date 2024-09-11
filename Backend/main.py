@@ -9,10 +9,7 @@ import logging
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading',
-                    engineio_logger=True, logger=True,
-                    ping_timeout=120000, ping_interval=50000,
-                    always_connect=True)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -188,17 +185,6 @@ def handle_select_winner(data):
     socketio.sleep(10)
     start_new_round()
 
-def run_server():
-    while True:
-        try:
-            logger.info("Starting the server...")
-            socketio.run(app, host='0.0.0.0', port=25565, debug=True, allow_unsafe_werkzeug=True)
-        except Exception as e:
-            logger.error(f"An error occurred while running the server: {e}", exc_info=True)
-            logger.info("Attempting to restart the server in 10 seconds...")
-            socketio.sleep(10)
-        else:
-            break
-
 if __name__ == '__main__':
-    run_server()
+    logger.info("Starting the server...")
+    socketio.run(app, host='0.0.0.0', port=25565, debug=True, allow_unsafe_werkzeug=True)
