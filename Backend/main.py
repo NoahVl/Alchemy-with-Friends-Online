@@ -171,4 +171,4 @@ def handle_select_winner(data):
     start_new_round()
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5000, ssl_context=ssl_context)
+    socketio.run(app, host='0.0.0.0', port=25565, ssl_context=ssl_context)
