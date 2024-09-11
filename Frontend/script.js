@@ -14,11 +14,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function connectToServer(serverIP) {
-    socket = io(`${serverIP}`);
+    console.log(`Attempting to connect to server at ${serverIP}`);
+    socket = io(serverIP, {
+        transports: ['websocket'],
+        upgrade: false,
+        reconnection: true,
+        reconnectionAttempts: 5
+    });
 
     socket.on('connect', () => {
         console.log('Connected to server');
         socket.emit('join_game', {name: playerName});
+    });
+
+    socket.on('connect_error', (error) => {
+        console.error('Connection error:', error);
+    });
+
+    socket.on('disconnect', (reason) => {
+        console.log('Disconnected:', reason);
     });
 
     setupSocketListeners();

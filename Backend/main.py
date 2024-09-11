@@ -9,7 +9,14 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading',
                     engineio_logger=True, logger=True,
-                    ping_timeout=60000, ping_interval=25000)
+                    ping_timeout=60000, ping_interval=25000,
+                    always_connect=True)
+
+# Add this function for better logging
+def log_socket_event(event, data=None):
+    print(f"Socket event: {event}")
+    if data:
+        print(f"Data: {data}")
 
 # Create locks
 cards_stack_lock = Lock()
@@ -84,12 +91,13 @@ def start_new_round():
 
 @socketio.on('connect')
 def handle_connect():
-    print(f"Client connected: {request.sid}")
+    log_socket_event('connect', {'sid': request.sid})
     emit('connection_success', {'message': 'Successfully connected to server'})
 
 @socketio.on('disconnect')
 def handle_disconnect():
     global game_in_progress
+    log_socket_event('disconnect', {'sid': request.sid})
     with players_lock:
         players[:] = [p for p in players if p['sid'] != request.sid]
         if len(players) == 0:
@@ -101,9 +109,11 @@ def handle_disconnect():
 @socketio.on('join_game')
 def handle_join(data):
     global game_in_progress
+    log_socket_event('join_game', data)
     username = data['name']
     with players_lock:
         if any(p['name'] == username for p in players):
+            log_socket_event('error', {'message': 'Username already taken'})
             emit('error', {'message': 'Username already taken'})
             return
         
@@ -120,16 +130,17 @@ def handle_join(data):
         players.append(player)
         join_room(request.sid)
     
+    log_socket_event('join_success', {'player': username, 'hand_size': len(hand)})
     emit('join_success', {'hand': hand, 'currentBlackCard': current_black_card})
     socketio.emit('player_list', {'players': [{'name': p['name'], 'isCzar': p['isCzar'], 'score': p['score']} for p in players]})
     
-    print(f"Player {username} joined. Total players: {len(players)}")  # Debug print
+    log_socket_event('player_joined', {'username': username, 'total_players': len(players)})
     
     if len(players) == 2:
-        print("Starting new game with 2 players")  # Debug print
+        log_socket_event('starting_new_game', {'players': len(players)})
         start_new_round()
     elif game_in_progress:
-        print(f"Game in progress, sending current state to {username}")  # Debug print
+        log_socket_event('game_in_progress', {'username': username})
         emit('new_round', {'blackCard': current_black_card, 'players': [{'name': p['name'], 'isCzar': p['isCzar'], 'score': p['score']} for p in players]})
 
 @socketio.on('submit_card')
@@ -173,4 +184,7 @@ def handle_select_winner(data):
     start_new_round()
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=25565, debug=True)
+    try:
+        socketio.run(app, host='0.0.0.0', port=25565, debug=True, allow_unsafe_werkzeug=True)
+    except Exception as e:
+        print(f"An error occurred while starting the server: {e}")
