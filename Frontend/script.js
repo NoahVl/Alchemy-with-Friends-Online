@@ -16,10 +16,12 @@ document.addEventListener('DOMContentLoaded', () => {
 function connectToServer(serverIP) {
     console.log(`Attempting to connect to server at ${serverIP}`);
     socket = io(serverIP, {
-        transports: ['websocket'],
-        upgrade: false,
+        transports: ['websocket', 'polling'],
+        upgrade: true,
         reconnection: true,
-        reconnectionAttempts: 5
+        reconnectionAttempts: 5,
+        timeout: 10000,
+        forceNew: true
     });
 
     socket.on('connect', () => {
@@ -29,10 +31,15 @@ function connectToServer(serverIP) {
 
     socket.on('connect_error', (error) => {
         console.error('Connection error:', error);
+        console.log('Connection error details:', error.description);
     });
 
     socket.on('disconnect', (reason) => {
         console.log('Disconnected:', reason);
+    });
+
+    socket.on('error', (error) => {
+        console.error('Socket error:', error);
     });
 
     setupSocketListeners();

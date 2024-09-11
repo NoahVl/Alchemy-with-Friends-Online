@@ -5,6 +5,8 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from threading import Lock
 
+import logging
+
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading',
@@ -12,11 +14,14 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading',
                     ping_timeout=60000, ping_interval=25000,
                     always_connect=True)
 
-# Add this function for better logging
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
 def log_socket_event(event, data=None):
-    print(f"Socket event: {event}")
+    logger.info(f"Socket event: {event}")
     if data:
-        print(f"Data: {data}")
+        logger.info(f"Data: {data}")
 
 # Create locks
 cards_stack_lock = Lock()
@@ -185,6 +190,7 @@ def handle_select_winner(data):
 
 if __name__ == '__main__':
     try:
+        logger.info("Starting the server...")
         socketio.run(app, host='0.0.0.0', port=25565, debug=True, allow_unsafe_werkzeug=True)
     except Exception as e:
-        print(f"An error occurred while starting the server: {e}")
+        logger.error(f"An error occurred while starting the server: {e}", exc_info=True)
