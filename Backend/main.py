@@ -1,10 +1,12 @@
 import json
 import random
 from flask import Flask, request
+from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from threading import Lock
 
 app = Flask(__name__)
+CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 # Create locks
