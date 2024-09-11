@@ -6,8 +6,10 @@ from flask_socketio import SocketIO, emit, join_room, leave_room
 from threading import Lock
 
 app = Flask(__name__)
-CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+CORS(app, resources={r"/*": {"origins": "*"}})
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading',
+                    engineio_logger=True, logger=True,
+                    ping_timeout=60000, ping_interval=25000)
 
 # Create locks
 cards_stack_lock = Lock()
@@ -171,4 +173,4 @@ def handle_select_winner(data):
     start_new_round()
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=25565, ssl_context=ssl_context)
+    socketio.run(app, host='0.0.0.0', port=25565, debug=True)
