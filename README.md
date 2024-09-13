@@ -1,7 +1,7 @@
-# 🃏 Cards Against Humanity Clone 🎭
+# 🃏 Alchemy with Friends - Online 🎭
 
 ## 🌟 Introduction
-Welcome to my Cards Against Humanity Clone! This project started as a fun way to play [Microsoft's Alchemy with Friends](https://www.microsoft.com/en-us/research/uploads/prod/2020/11/Alchemy-with-Friends-Print-at-Home-2020.pdf) with my friends, but can be used to play with any (manually inserted) cards for a Cards Against Humanity-style game.
+Welcome to my Alchemy with Friends Online Game! This project started as a fun way to play [Microsoft's Alchemy with Friends](https://www.microsoft.com/en-us/research/uploads/prod/2020/11/Alchemy-with-Friends-Print-at-Home-2020.pdf) with my friends, but can be used to play with any (manually inserted) cards for a Cards Against Humanity-style game.
 
 ## 🚀 Features
 - Real-time multiplayer gameplay using WebSockets
@@ -31,5 +31,8 @@ Feel free to fork this project and make your own improvements. Pull requests are
 
 ## 📜 License
 This project is open-source and available under the MIT License.
+
+## Icon
+Icon taken from https://uxwing.com/witch-icon/.
 
 Happy gaming! 🎉
