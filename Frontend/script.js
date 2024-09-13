@@ -190,8 +190,9 @@ function setupSocketListeners() {
 
         if (selectedCard) {
             let cardText;
-            if (selectedCard.querySelector('textarea')) {
-                cardText = selectedCard.querySelector('textarea').value.trim();
+            if (selectedCard.classList.contains('blank-card')) {
+                const textarea = selectedCard.querySelector('textarea');
+                cardText = textarea ? textarea.value.trim() : '';
                 if (!cardText) {
                     alert('Please fill in the blank card before submitting.');
                     return;
@@ -270,7 +271,8 @@ function setupSocketListeners() {
                 const card = document.createElement('div');
                 card.className = 'card face-down';
                 if (text.startsWith('[BLANK] ')) {
-                    card.textContent = text.substring(7); // Remove the '[BLANK] ' prefix
+                    const blankText = text.substring(7); // Remove the '[BLANK] ' prefix
+                    card.innerHTML = `<span class="blank-indicator">[BLANK]</span> ${blankText}`;
                     card.classList.add('blank-card');
                 } else {
                     card.textContent = text;

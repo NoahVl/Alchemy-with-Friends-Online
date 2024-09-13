@@ -229,3 +229,12 @@ input[type="text"] {
 .connect-btn:hover {
     background-color: #45a049;
 }
+.blank-indicator {
+    font-weight: bold;
+    color: #ff4500;
+    font-style: italic;
+}
+
+.blank-card {
+    background-color: #fff0f5;
+}
