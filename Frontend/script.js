@@ -141,7 +141,10 @@ function setupSocketListeners() {
 
     socket.on('round_winner', (data) => {
         const winningCards = Array.from(document.querySelectorAll('#white-cards .card'))
-            .filter(card => data.cards.includes(card.textContent));
+            .filter(card => {
+                const cardText = card.classList.contains('blank-card') ? '[BLANK] ' + card.textContent : card.textContent;
+                return data.cards.includes(cardText);
+            });
         winningCards.forEach(card => {
             card.classList.add('winner');
             card.title = `Winning card played by ${data.player}`;
@@ -300,7 +303,7 @@ function setupSocketListeners() {
                 const card = document.createElement('div');
                 card.className = 'card face-down';
                 if (text.startsWith('[BLANK] ')) {
-                    const blankText = text.substring(7); // Remove the '[BLANK] ' prefix
+                    const blankText = text.substring(8); // Remove the '[BLANK] ' prefix
                     card.innerHTML = `${blankText}`;
                     card.classList.add('blank-card');
                 } else {
