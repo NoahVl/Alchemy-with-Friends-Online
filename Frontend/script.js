@@ -180,6 +180,9 @@ function setupSocketListeners() {
 
     // Submitting cards
     document.getElementById('submit-card').addEventListener('click', () => {
+        // Simply wait for a second.
+        setTimeout(() => {}, 500);
+
         if (hasSubmittedCards) {
             alert('You have already submitted your card(s) for this round.');
             return;
@@ -189,34 +192,42 @@ function setupSocketListeners() {
         const requiredCards = parseInt(blackCard.dataset.pick);
         const selectedCard = document.querySelector('#player-hand .card.selected');
 
-        if (selectedCard) {
-            let cardText;
-            console.log("Selected card:", selectedCard);  // Debug log
-            if (selectedCard.classList.contains('blank-card')) {
-                const textarea = selectedCard.querySelector('textarea');
-                cardText = textarea ? textarea.value.trim() : '';
-                if (!cardText) {
-                    alert('Please fill in the blank card before submitting.');
-                    return;
-                }
-                cardText = '[BLANK] ' + cardText; // Add a prefix to identify blank cards
-            } else {
-                cardText = selectedCard.textContent;
-            }
-            selectedCards.push(cardText);
-            selectedCard.remove();
+        if (!selectedCard) {
+            alert('Please select a card to submit.');
+            return;
+        }
 
-            if (selectedCards.length === requiredCards) {
-                socket.emit('submit_card', {cards: selectedCards});
-                selectedCards = [];
-                document.getElementById('submit-card').textContent = 'Submit Card';
-                hasSubmittedCards = true;
-                document.getElementById('submit-card').disabled = true;
-            } else {
-                document.getElementById('submit-card').textContent = 'Submit 2nd Card';
+        let cardText = '';
+        console.log(selectedCard)
+
+        // Handle blank cards
+        if (selectedCard.classList.contains('blank-card')) {
+            const textarea = selectedCard.querySelector('textarea');
+            if (textarea) {
+                cardText = textarea.dataset.textValue ? textarea.dataset.textValue.trim() : '';  // Retrieve the stored value
             }
+            if (!cardText) {
+                alert('Please fill in the blank card before submitting.');
+                return;
+            }
+            cardText = '[BLANK] ' + cardText;  // Prefix custom text with [BLANK]
         } else {
-            alert(`Please select a card to submit.`);
+            cardText = selectedCard.textContent;  // Get the text content of non-blank cards
+        }
+
+        selectedCards.push(cardText);  // Add the selected card text to the list
+
+        // Remove the selected card from the player's hand
+        selectedCard.remove();
+
+        if (selectedCards.length === requiredCards) {
+            socket.emit('submit_card', {cards: selectedCards});
+            selectedCards = [];  // Clear the selected cards array after submission
+            document.getElementById('submit-card').textContent = 'Submit Card';
+            hasSubmittedCards = true;
+            document.getElementById('submit-card').disabled = true;
+        } else {
+            document.getElementById('submit-card').textContent = 'Submit 2nd Card';
         }
     });
 
@@ -238,30 +249,46 @@ function setupSocketListeners() {
 
     function updatePlayerHand(hand) {
         const playerHand = document.getElementById('player-hand');
-        playerHand.innerHTML = '';
+        playerHand.innerHTML = ''; // Clear the current hand
+
         hand.forEach(text => {
             const card = document.createElement('div');
             card.className = 'card';
+
             if (text === '[BLANK]') {
-                const input = document.createElement('textarea');
-                input.placeholder = 'Type your custom text here';
-                input.maxLength = 100;  // Limit the length of custom text
-                card.appendChild(input);
+                // Mark the card as blank and add a textarea for custom text
+                card.classList.add('blank-card');
+
+                const textarea = document.createElement('textarea');
+                textarea.placeholder = 'Type your custom text here';
+                textarea.maxLength = 100;
+
+                // Event listener to capture input and store value
+                textarea.addEventListener('input', (event) => {
+                    textarea.dataset.textValue = event.target.value; // Store input value in dataset
+                });
+
+                card.appendChild(textarea);
             } else {
-                card.innerHTML = text;
+                card.textContent = text; // Non-blank cards, simply show the text
             }
+
+            // Event listener for selecting a card
             card.addEventListener('click', () => {
                 if (!isCardCzar) {
+                    // Deselect other cards
                     document.querySelectorAll('#player-hand .card').forEach(c => c.classList.remove('selected'));
-                    card.classList.add('selected');
+                    card.classList.add('selected');  // Mark this card as selected
                 }
             });
+
             playerHand.appendChild(card);
         });
 
         // Reset submit button text
         document.getElementById('submit-card').textContent = 'Submit Card';
     }
+
 
     function displaySubmittedCards(submissions) {
         const whiteCards = document.getElementById('white-cards');
@@ -274,7 +301,7 @@ function setupSocketListeners() {
                 card.className = 'card face-down';
                 if (text.startsWith('[BLANK] ')) {
                     const blankText = text.substring(7); // Remove the '[BLANK] ' prefix
-                    card.innerHTML = `<span class="blank-indicator">[BLANK]</span> ${blankText}`;
+                    card.innerHTML = `${blankText}`;
                     card.classList.add('blank-card');
                 } else {
                     card.textContent = text;

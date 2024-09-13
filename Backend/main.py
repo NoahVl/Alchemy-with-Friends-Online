@@ -8,8 +8,8 @@ from threading import Lock
 import logging
 
 # Configuration
-INCLUDE_BLANK_CARDS = True  # Set this to False to disable blank cards
-BLANK_CARD_PROBABILITY = 0.05  # 5% chance for a card to be blank
+INCLUDE_BLANK_CARDS = True  # Set this to False to disable blank cards, strangers might not behave well with them enabled
+BLANK_CARD_PROBABILITY = 0.95  # 5% chance for a card to be blank
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -28,6 +28,7 @@ def log_socket_event(event, data=None):
 cards_stack_lock = Lock()
 black_cards_lock = Lock()
 players_lock = Lock()
+submitted_cards_lock = Lock()
 
 # Load cards
 def load_cards():
@@ -153,27 +154,41 @@ def handle_join(data):
 
 @socketio.on('submit_card')
 def handle_submit_card(data):
-    cards = data['cards']
+    player_submitted_cards: list = data['cards']
     player = next((p for p in players if p['sid'] == request.sid), None)
-    if player and not player['isCzar'] and all(card in player['hand'] for card in cards):
-        existing_submission = next((s for s in submitted_cards if s['player'] == player['name']), None)
-        if existing_submission:
-            # Player has already submitted, don't allow another submission
-            emit('error', {'message': 'You have already submitted cards for this round'})
-            return
-        else:
-            submitted_cards.append({'cards': cards, 'player': player['name']})
-        for card in cards:
-            player['hand'].remove(card)
-        emit('card_submitted', {'message': 'Card(s) submitted successfully'})
-        socketio.emit('update_submitted_cards', {'count': len(submitted_cards)})
-        
-        all_submissions_complete = all(len(s['cards']) == current_black_card['pick'] for s in submitted_cards)
-        if len(submitted_cards) == len(players) - 1 and all_submissions_complete:  # All non-Czar players have submitted all required cards
-            # Shuffle the submitted cards before sending them
-            shuffled_submissions = submitted_cards.copy()
-            random.shuffle(shuffled_submissions)
-            socketio.emit('all_cards_submitted', {'submissions': shuffled_submissions})
+
+    print(f"Player {player['name']} submitted cards: {player_submitted_cards}")  # Debug print
+
+    with submitted_cards_lock:
+        if player and not player['isCzar'] and all(card in player['hand'] or
+                                                   "BLANK" in card and any("BLANK" in card for card in player['hand'])
+                                                   for card in player_submitted_cards):
+            existing_submission = next((s for s in submitted_cards if s['player'] == player['name']), None)
+            if existing_submission:
+                # Player has already submitted, don't allow another submission
+                emit('error', {'message': 'You have already submitted cards for this round'})
+                return
+            else:
+                submitted_cards.append({'cards': player_submitted_cards, 'player': player['name']})
+            for card in player_submitted_cards:
+                with players_lock:
+                    if card in player['hand']:
+                        player['hand'].remove(card)
+                    elif "BLANK" in card:  # Not a robust method as the client can pretend they had a blank card, but hac
+                        # Remove the first blank card from the player's hand
+                        player['hand'].remove(next(c for c in player['hand'] if "BLANK" in c))
+                    else:
+                        # Someone has been cheating :(
+                        print(f"Player {player['name']} tried to submit a card they don't have: {card}") # Debug print
+            emit('card_submitted', {'message': 'Card(s) submitted successfully'})
+            socketio.emit('update_submitted_cards', {'count': len(submitted_cards)})
+
+            all_submissions_complete = all(len(s['cards']) == current_black_card['pick'] for s in submitted_cards)
+            if len(submitted_cards) == len(players) - 1 and all_submissions_complete:  # All non-Czar players have submitted all required cards
+                # Shuffle the submitted cards before sending them
+                shuffled_submissions = submitted_cards.copy()
+                random.shuffle(shuffled_submissions)
+                socketio.emit('all_cards_submitted', {'submissions': shuffled_submissions})
 
 @socketio.on('select_winner')
 def handle_select_winner(data):
