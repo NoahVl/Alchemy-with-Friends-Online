@@ -25,9 +25,6 @@ cards_stack_lock = Lock()
 black_cards_lock = Lock()
 players_lock = Lock()
 
-# Path to your certificate and key files
-ssl_context = ('./cert.pem', './key.pem')
-
 # Load cards
 def load_cards():
     with open('cards.json') as f:
