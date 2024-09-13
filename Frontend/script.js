@@ -164,7 +164,7 @@ function setupSocketListeners() {
     });
 
     let selectedCards = [];
-    
+
     document.getElementById('submit-card').addEventListener('click', () => {
         if (hasSubmittedCards) {
             alert('You have already submitted your card(s) for this round.');
@@ -174,11 +174,11 @@ function setupSocketListeners() {
         const blackCard = document.getElementById('black-card');
         const requiredCards = parseInt(blackCard.dataset.pick);
         const selectedCard = document.querySelector('#player-hand .card.selected');
-        
+
         if (selectedCard) {
             selectedCards.push(selectedCard.textContent);
             selectedCard.remove();
-            
+
             if (selectedCards.length === requiredCards) {
                 socket.emit('submit_card', {cards: selectedCards});
                 selectedCards = [];
@@ -224,7 +224,7 @@ function setupSocketListeners() {
             });
             playerHand.appendChild(card);
         });
-        
+
         // Reset submit button text
         document.getElementById('submit-card').textContent = 'Submit Card';
     }
