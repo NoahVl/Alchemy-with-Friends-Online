@@ -189,7 +189,17 @@ function setupSocketListeners() {
         const selectedCard = document.querySelector('#player-hand .card.selected');
 
         if (selectedCard) {
-            selectedCards.push(selectedCard.textContent);
+            let cardText;
+            if (selectedCard.querySelector('textarea')) {
+                cardText = selectedCard.querySelector('textarea').value.trim();
+                if (!cardText) {
+                    alert('Please fill in the blank card before submitting.');
+                    return;
+                }
+            } else {
+                cardText = selectedCard.textContent;
+            }
+            selectedCards.push(cardText);
             selectedCard.remove();
 
             if (selectedCards.length === requiredCards) {
@@ -228,7 +238,14 @@ function setupSocketListeners() {
         hand.forEach(text => {
             const card = document.createElement('div');
             card.className = 'card';
-            card.innerHTML = text;
+            if (text === '[BLANK]') {
+                const input = document.createElement('textarea');
+                input.placeholder = 'Type your custom text here';
+                input.maxLength = 100;  // Limit the length of custom text
+                card.appendChild(input);
+            } else {
+                card.innerHTML = text;
+            }
             card.addEventListener('click', () => {
                 if (!isCardCzar) {
                     document.querySelectorAll('#player-hand .card').forEach(c => c.classList.remove('selected'));

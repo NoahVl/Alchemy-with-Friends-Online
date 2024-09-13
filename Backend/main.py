@@ -7,6 +7,10 @@ from threading import Lock
 
 import logging
 
+# Configuration
+INCLUDE_BLANK_CARDS = True  # Set this to False to disable blank cards
+BLANK_CARD_PROBABILITY = 0.05  # 5% chance for a card to be blank
+
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
@@ -29,6 +33,11 @@ players_lock = Lock()
 def load_cards():
     with open('cards.json') as f:
         cards = json.load(f)
+    
+    if INCLUDE_BLANK_CARDS:
+        blank_cards = ['[BLANK]'] * int(len(cards['whiteCards']) * BLANK_CARD_PROBABILITY)
+        cards['whiteCards'].extend(blank_cards)
+    
     random.shuffle(cards['whiteCards'])
     random.shuffle(cards['blackCards'])
     return cards
