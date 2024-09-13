@@ -9,7 +9,7 @@ import logging
 
 # Configuration
 INCLUDE_BLANK_CARDS = True  # Set this to False to disable blank cards, strangers might not behave well with them enabled
-BLANK_CARD_PROBABILITY = 0.95  # 5% chance for a card to be blank
+BLANK_CARD_PROBABILITY = 0.05  # 5% chance for a card to be blank
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
