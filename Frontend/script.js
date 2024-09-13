@@ -196,6 +196,7 @@ function setupSocketListeners() {
                     alert('Please fill in the blank card before submitting.');
                     return;
                 }
+                cardText = '[BLANK] ' + cardText; // Add a prefix to identify blank cards
             } else {
                 cardText = selectedCard.textContent;
             }
@@ -268,7 +269,12 @@ function setupSocketListeners() {
             submission.cards.forEach(text => {
                 const card = document.createElement('div');
                 card.className = 'card face-down';
-                card.textContent = text;
+                if (text.startsWith('[BLANK] ')) {
+                    card.textContent = text.substring(7); // Remove the '[BLANK] ' prefix
+                    card.classList.add('blank-card');
+                } else {
+                    card.textContent = text;
+                }
                 submissionContainer.appendChild(card);
             });
             submissionContainer.addEventListener('click', () => {

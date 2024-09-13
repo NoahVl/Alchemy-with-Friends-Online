@@ -39,6 +39,17 @@
     transition: all 0.3s ease;
 }
 
+.card textarea {
+    width: 90%;
+    height: 80%;
+    resize: none;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    text-align: center;
+    background-color: transparent;
+}
+
 #black-card {
     background-color: black;
     color: white;
