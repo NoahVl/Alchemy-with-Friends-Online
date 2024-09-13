@@ -4,24 +4,28 @@
 }
 
 .card-container {
-    background-color: #f0f0f0; /* Adjust as needed */
+    background-color: #f0f0f0;
     padding: 20px;
     border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #white-cards, #player-hand {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: start;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .card {
     border: 3px solid black;
     padding: 10px;
     margin: 10px;
-    width: 120px; /* Adjust as needed */
-    height: 200px; /* Adjust as needed */
+    width: 150px;
+    height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -31,6 +35,17 @@
     overflow-y: auto;
     word-wrap: break-word;
     white-space: pre-wrap;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+#black-card {
+    background-color: black;
+    color: white;
+    width: 180px;
+    height: 240px;
+    font-weight: bold;
+    font-size: 1.1em;
 }
 
 .card.selected {
