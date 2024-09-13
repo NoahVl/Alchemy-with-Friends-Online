@@ -178,6 +178,7 @@ function setupSocketListeners() {
 
     let selectedCards = [];
 
+    // Submitting cards
     document.getElementById('submit-card').addEventListener('click', () => {
         if (hasSubmittedCards) {
             alert('You have already submitted your card(s) for this round.');
@@ -190,6 +191,7 @@ function setupSocketListeners() {
 
         if (selectedCard) {
             let cardText;
+            console.log("Selected card:", selectedCard);  // Debug log
             if (selectedCard.classList.contains('blank-card')) {
                 const textarea = selectedCard.querySelector('textarea');
                 cardText = textarea ? textarea.value.trim() : '';
