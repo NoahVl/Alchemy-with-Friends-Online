@@ -34,7 +34,7 @@ def load_cards():
     return cards
 
 cards = load_cards()
-MAX_WHITE_CARDS = 3
+MAX_WHITE_CARDS = 7
 
 # Game state
 players = []
@@ -179,7 +179,7 @@ def handle_select_winner(data):
     
     socketio.emit('round_winner', {'cards': winning_submission, 'player': winner})
     socketio.emit('start_new_round_countdown')
-    socketio.sleep(10)
+    socketio.sleep(5)
     start_new_round()
 
 if __name__ == '__main__':
