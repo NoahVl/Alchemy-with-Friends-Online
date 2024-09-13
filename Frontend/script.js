@@ -4,6 +4,19 @@ let isCardCzar = false;
 let hasSelectedWinner = false;
 let hasSubmittedCards = false;
 
+document.addEventListener("DOMContentLoaded", function() {
+    const playerNameInput = document.getElementById("player-name");
+
+    fetch('names.json')
+        .then(response => response.json())
+        .then(data => {
+            const randomNames = data.randomNames;
+            const randomIndex = Math.floor(Math.random() * randomNames.length);
+            playerNameInput.value = randomNames[randomIndex];
+        })
+        .catch(error => console.error('Error fetching names:', error));
+})
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-form').addEventListener('submit', (event) => {
         event.preventDefault();
@@ -148,7 +161,7 @@ function setupSocketListeners() {
 
     socket.on('start_new_round_countdown', () => {
         console.log("Starting countdown for new round");
-        let countdown = 10;
+        let countdown = 5;
         const countdownInterval = setInterval(() => {
             console.log(`New round starting in ${countdown} seconds`);
             countdown--;
