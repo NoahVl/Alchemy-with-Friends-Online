@@ -1,7 +1,7 @@
 # 🃏 Alchemy with Friends - Online 🎭
 
 ## 🌟 Introduction
-Welcome to my Alchemy with Friends Online Game! This project started as a fun way to play [Microsoft's Alchemy with Friends](https://www.microsoft.com/en-us/research/uploads/prod/2020/11/Alchemy-with-Friends-Print-at-Home-2020.pdf) with my friends, but can be used to play with any (manually inserted) cards for a Cards Against Humanity-style game.
+Welcome to my "Alchemy with Friends - Online" game! This project started as a fun way to play [Microsoft's Alchemy with Friends](https://www.microsoft.com/en-us/research/uploads/prod/2020/11/Alchemy-with-Friends-Print-at-Home-2020.pdf) with my friends, but can be used to play with any (manually inserted) cards for a Cards Against Humanity-style game.
 
 ## 🚀 Features
 - Real-time multiplayer gameplay using WebSockets
@@ -9,7 +9,7 @@ Welcome to my Alchemy with Friends Online Game! This project started as a fun wa
 - Customizable card decks
 
 ## ⚠️ Disclaimer
-This is a quick project to explore AI-assisted web development. **Please note:** This project should not be hosted in any serious setting as players may be able to manipulate their data and send it to the server.
+This is a quick project to explore AI-assisted web development. **Please note:** This project should not be hosted in any serious setting as players may be able to manipulate their data and send it to the server. The code is not indicative of my web development skills, but simply to see how far along the technology is to make functional game sites.
 
 ## 🛠️ Technology Stack
 - Frontend: HTML, CSS, JavaScript
