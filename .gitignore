@@ -156,3 +156,4 @@ cython_debug/
 Backend/cards_backup.json
 Frontend/CNAME
 *.pem
+Backend/player_scores.json

@@ -1,5 +1,6 @@
 import json
 import random
+import os
 from urllib.parse import urlparse, urlunparse
 
 from flask import Flask, request, redirect
@@ -68,6 +69,19 @@ current_black_card = None
 submitted_cards = []
 winning_card = None
 game_in_progress = False
+
+SCORES_FILE = 'player_scores.json'
+
+def save_scores():
+    scores = {player['name']: player['score'] for player in players}
+    with open(SCORES_FILE, 'w') as f:
+        json.dump(scores, f)
+
+def load_scores():
+    if os.path.exists(SCORES_FILE):
+        with open(SCORES_FILE, 'r') as f:
+            return json.load(f)
+    return {}
 
 def get_black_card():
     with black_cards_lock:
@@ -145,11 +159,12 @@ def handle_join(data):
         hand = cards['whiteCards'][:MAX_WHITE_CARDS]
         cards['whiteCards'] = cards['whiteCards'][MAX_WHITE_CARDS:]
         
+        scores = load_scores()
         player = {
             'sid': request.sid,
             'name': username,
             'isCzar': len(players) == 0,
-            'score': 0,
+            'score': scores.get(username, 0),  # Load the score if it exists, otherwise 0
             'hand': hand
         }
         players.append(player)
@@ -219,6 +234,7 @@ def handle_select_winner(data):
     
     socketio.emit('round_winner', {'cards': winning_submission, 'player': winner})
     socketio.emit('start_new_round_countdown')
+    save_scores()  # Save scores after each round
     socketio.sleep(5)
     start_new_round()
 
