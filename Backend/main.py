@@ -1,6 +1,8 @@
 import json
 import random
-from flask import Flask, request
+from urllib.parse import urlparse, urlunparse
+
+from flask import Flask, request, redirect
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from threading import Lock
@@ -10,6 +12,7 @@ import logging
 # Configuration
 INCLUDE_BLANK_CARDS = True  # Set this to False to disable blank cards, strangers might not behave well with them enabled
 BLANK_CARD_PROBABILITY = 0.05  # 5% chance for a card to be blank
+GAME_SITE_URL = "https://nogames.surge.sh"
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -18,6 +21,19 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+@app.route('/')
+def hello():
+    # Redirecting logic for when connecting directly to the server
+
+    # Parse the original URL
+    parsed_url = urlparse(request.url)
+    # Force the scheme to https
+    https_url = parsed_url._replace(scheme="https")
+    origin_url = urlunparse(https_url)
+
+    # Redirect to the game site
+    return redirect(f"{GAME_SITE_URL}?origin={origin_url}", code=302)
 
 def log_socket_event(event, data=None):
     logger.info(f"Socket event: {event}")

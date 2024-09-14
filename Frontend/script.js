@@ -15,6 +15,15 @@ document.addEventListener("DOMContentLoaded", function() {
             playerNameInput.value = randomNames[randomIndex];
         })
         .catch(error => console.error('Error fetching names:', error));
+
+    // Check if there's an origin server IP in the query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const originServerIP = urlParams.get('origin');
+
+    // Use the query parameter if available, or fallback to window location hostname
+    const defaultServerIP = originServerIP || 'http://localhost:25565';
+    const serverIPInput = document.getElementById('server-ip');
+    serverIPInput.value = defaultServerIP
 })
 
 document.addEventListener('DOMContentLoaded', () => {
