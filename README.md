@@ -26,10 +26,14 @@ The code is not indicative of my web development skills (because it's a mess), b
 - Rewritten using [aider](https://aider.chat) to implement WebSockets
 
 ## 🎮 How to Play
-1. Clone the repository
-2. Set up the backend server
-3. Open the frontend in a web browser
-4. Invite your friends and enjoy!
+### 1. Clone the repository
+### 2. Set up the backend server
+1. Install the dependencies
+2. Run the `main.py` server.
+3. Make it so that the internet can see your server. Personally I used [localtunnel](https://localtunnel.me/) to expose my computer to the internet via the specified port. This prevents having to rent a VPS or port forwarding via your router.
+### 3. Open the frontend in a web browser
+To host my site for free I used [surge](surge.sh).
+### 4. Invite your friends and enjoy!
 
 ## 🤝 Contributing
 Feel free to fork this project and make your own improvements. Pull requests are welcome!
@@ -41,4 +45,4 @@ This project is open-source and available under the MIT License.
 Icon taken from https://uxwing.com/witch-icon/.
 
 
-Enjoy and happy gaming! 🎉
+Happy gaming! 🎉
