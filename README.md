@@ -5,8 +5,9 @@ Welcome to my "Alchemy with Friends - Online" game! This project started as a fu
 
 ## 🚀 Features
 - Real-time multiplayer gameplay using WebSockets
-- Dynamic card submission and selection
 - Customizable card decks
+- Scoreboard resilient to server crashes
+- Blank cards for the user to fill in
 
 ## ⚠️ Disclaimer
 This is a quick project to explore AI-assisted web development. **Please note:** This project should not be hosted in any serious setting as players may be able to manipulate their data and send it to the server. The code is not indicative of my web development skills, but simply to see how far along the technology is to make functional game sites.
