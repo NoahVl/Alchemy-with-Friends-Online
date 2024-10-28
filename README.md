@@ -1,5 +1,7 @@
 # 🃏 Alchemy with Friends - Online 🎭
 
+<img src="./game.png" alt="drawing" width="500"/>
+
 ## 🌟 Introduction
 Welcome to my "Alchemy with Friends - Online" game! This project started as a fun way to play [Microsoft's Alchemy with Friends](https://www.microsoft.com/en-us/research/uploads/prod/2020/11/Alchemy-with-Friends-Print-at-Home-2020.pdf) with my friends over the internet. However, it can be used to play with any (manually inserted) cards for a fill-in-the-blank style game, similar to popular party games.
 
