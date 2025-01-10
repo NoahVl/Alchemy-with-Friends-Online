@@ -39,7 +39,7 @@ The code is not indicative of my web development skills (because it's a mess), b
 2. Run the `main.py` server.
 3. Make it so that the internet can see your server with the port you defined. Personally I used [localtunnel](https://localtunnel.me/) to expose my computer to the internet via the specified port (`lt --port 25565`). This prevents having to rent a VPS or port forward via your router.
 ### 3. Open the frontend in a web browser
-To host my site for free I used [surge](surge.sh).
+To host my site for free I used [surge](https://surge.sh).
 ### 4. Invite your friends and enjoy!
 
 ## 🤝 Contributing
