@@ -30,7 +30,7 @@ The code is not indicative of my web development skills (because it's a mess), b
 
 ## 🧠 AI Assistance
 - Originally written with the help of GitHub Copilot
-- Rewritten using [aider](https://aider.chat) to implement WebSockets
+- Rewritten using [aider](https://aider.chat) to implement WebSockets (using `claude-3-5-sonnet-20240620`) as Copilot's frequent polling was difficult to debug
 
 ## 🎮 How to Play
 ### 1. Clone the repository
