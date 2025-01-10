@@ -6,7 +6,7 @@
 Welcome to my "Alchemy with Friends - Online" game! This project started as a fun way to play [Microsoft's Alchemy with Friends](https://www.microsoft.com/en-us/research/uploads/prod/2020/11/Alchemy-with-Friends-Print-at-Home-2020.pdf) with my friends over the internet. However, it can be used to play with any (manually inserted) cards for a fill-in-the-blank style game, similar to popular party games.
 
 ## 🃏 Cards
-Cards have been copied from [Microsoft's Alchemy with Friends](https://www.microsoft.com/en-us/research/uploads/prod/2020/11/Alchemy-with-Friends-Print-at-Home-2020.pdf), including the [Expansion Pack](https://www.microsoft.com/en-us/research/uploads/prod/2020/06/Alchemy-with-Friends-ML-Expansion-Pack.pdf) and the [Visionary Edition](https://www.microsoft.com/en-us/research/uploads/prod/2020/06/Alchemy-with-Friends-CV-Expansion-Pack.pdf). However, the `Backend/cards.json` file can be edited to contain whatever card you desire.
+Cards have been copied from [Microsoft's Alchemy with Friends](https://www.microsoft.com/en-us/research/uploads/prod/2020/11/Alchemy-with-Friends-Print-at-Home-2020.pdf), including the [Expansion Pack](https://www.microsoft.com/en-us/research/uploads/prod/2020/06/Alchemy-with-Friends-ML-Expansion-Pack.pdf) and the [Visionary Edition](https://www.microsoft.com/en-us/research/uploads/prod/2020/06/Alchemy-with-Friends-CV-Expansion-Pack.pdf). However, the `Backend/cards.json` file can be edited to contain whatever cards you desire.
 
 Please let me know if Microsoft has released other expansion packs or related card games!
 
